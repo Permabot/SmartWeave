@@ -24,7 +24,7 @@ import { unpackTags } from './utils';
  */
 export async function interactWrite(
   arweave: Arweave,
-  wallet: JWKInterface | 'use_wallet',
+  wallet: JWKInterface | 'use_wallet'| 'use_arconnect',
   contractId: string,
   input: any,
   tags: { name: string; value: string }[] = [],
@@ -84,7 +84,7 @@ export async function simulateInteractWrite(
  */
 export async function interactWriteDryRun(
   arweave: Arweave,
-  wallet: JWKInterface | 'use_wallet',
+  wallet: JWKInterface | 'use_wallet' | 'use_arconnect',
   contractId: string,
   input: any,
   tags: { name: string; value: string }[] = [],
@@ -191,7 +191,7 @@ export async function interactWriteDryRunCustom(
  */
 export async function interactRead(
   arweave: Arweave,
-  wallet: JWKInterface | 'use_wallet' | undefined,
+  wallet: JWKInterface | 'use_wallet' | 'use_arconnect' | undefined,
   contractId: string,
   input: any,
   tags: { name: string; value: string }[] = [],
@@ -223,7 +223,7 @@ export async function interactRead(
 
 async function createTx(
   arweave: Arweave,
-  wallet: JWKInterface | 'use_wallet',
+  wallet: JWKInterface | 'use_wallet'| 'use_arconnect',
   contractId: string,
   input: any,
   tags: { name: string; value: string }[],
@@ -241,7 +241,9 @@ async function createTx(
     }
   }
 
-  const interactionTx = await arweave.createTransaction(options, wallet);
+  const interactionTx = wallet === 'use_arconnect' ? 
+    await arweave.createTransaction(options ) : 
+    await arweave.createTransaction(options,wallet ) ;
 
   if (!input) {
     throw new Error(`Input should be a truthy value: ${JSON.stringify(input)}`);
@@ -257,7 +259,12 @@ async function createTx(
   interactionTx.addTag('Contract', contractId);
   interactionTx.addTag('Input', JSON.stringify(input));
 
-  await arweave.transactions.sign(interactionTx, wallet);
+  if(wallet==='use_arconnect'){
+    await arweave.transactions.sign(interactionTx );
+  }else{
+    await arweave.transactions.sign(interactionTx, wallet );
+  }
+  
   return interactionTx;
 }
 
