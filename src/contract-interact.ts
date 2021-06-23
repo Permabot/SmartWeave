@@ -96,7 +96,7 @@ export async function interactWriteDryRun(
 ): Promise<ContractInteractionResult> {
   const contractInfo = contractInfoParam || (await loadContract(arweave, contractId));
   const latestState = myState || (await readContract(arweave, contractId));
-  const from = fromParam || (await arweave.wallets.getAddress(wallet));
+  const from = fromParam || (await arweave.wallets.getAddress(<JWKInterface | 'use_wallet'> wallet));
 
   const interaction: ContractInteraction = {
     input,
@@ -200,7 +200,7 @@ export async function interactRead(
 ): Promise<any> {
   const contractInfo = await loadContract(arweave, contractId);
   const latestState = await readContract(arweave, contractId);
-  const from = wallet ? await arweave.wallets.getAddress(wallet) : '';
+  const from = wallet ? await arweave.wallets.getAddress(<JWKInterface | 'use_wallet'>wallet) : '';
 
   const interaction: ContractInteraction = {
     input,
